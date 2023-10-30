@@ -1,11 +1,12 @@
+import 'dart:io';
+
 import 'package:bot_toast/bot_toast.dart';
-import 'package:clean_architecture_template/features/chats/presentation/screens/main_chats_screen.dart';
+import 'package:clean_architecture_template/redirector.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_app_badger/flutter_app_badger.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
-import 'dart:io';
-import 'package:easy_localization/easy_localization.dart';
 
 import 'app_config.dart';
 import 'injection_container.dart';
@@ -61,7 +62,7 @@ class _MyAppState extends State<MyApp> {
       localizationsDelegates: context.localizationDelegates,
       supportedLocales: context.supportedLocales,
       locale: context.locale,
-      home: const MainChatsScreen(),
+      home: RedirectPage(),
     );
   }
 }

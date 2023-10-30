@@ -2,7 +2,6 @@ import 'package:clean_architecture_template/core/style/text_styles.dart';
 import 'package:clean_architecture_template/core/util/pixel_sizer.dart';
 import 'package:flutter/material.dart';
 
-import 'colors.dart';
 import 'input_borders.dart';
 
 BaseInputDecoration get cOutlineInputDecoration =>
@@ -11,13 +10,13 @@ BaseInputDecoration get cOutlineInputDecoration =>
 class CustomOutlineInputDecoration extends BaseInputDecoration {
   CustomOutlineInputDecoration()
       : super(
-          textStyle: font.black.s12.w500,
+          textStyle: nunito.white.s12.w500,
           border: COutlineInputBorders.inactiveTextField,
           enabledBorder: COutlineInputBorders.inactiveTextField,
           focusedBorder: COutlineInputBorders.activeTextField,
           filled: true,
-          fillColor: CColors.white,
-          hintStyle: font.black.s14.w500,
+          fillColor: Color(0x5500acdf),
+          hintStyle: nunitoSans.white.s14.w500,
         );
 }
 

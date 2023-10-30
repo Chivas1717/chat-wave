@@ -1,5 +1,7 @@
 abstract class SvgIcons {
-  static const String _path = 'assets/icons';
+  static const String eye = '$_path/eye.svg';
+  static const String eyeCrossed = '$_path/eye_crossed.svg';
+  static const String _path = 'assets/icons/svg';
 }
 
 abstract class PngIcons {

@@ -1,3 +1,4 @@
+import 'package:clean_architecture_template/core/style/input_decorations.dart';
 import 'package:clean_architecture_template/features/chats/data/models/chat_model.dart';
 import 'package:clean_architecture_template/features/chats/data/models/message_model.dart';
 import 'package:clean_architecture_template/features/chats/data/models/user_model.dart';
@@ -98,27 +99,27 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                         });
                       },
                       style: Theme.of(context).textTheme.bodyMedium,
-                      decoration: InputDecoration(
-                        filled: true,
-                        fillColor: Theme.of(context)
-                            .colorScheme
-                            .secondary
-                            .withAlpha(150),
-                        hintText: 'Type here...',
-                        hintStyle: Theme.of(context).textTheme.bodyMedium,
-                        // disabledBorder: const OutlineInputBorder(
-                        //   // width: 0.0 produces a thin "hairline" border
-                        //   borderSide:
-                        //       const BorderSide(color: Colors.white, width: 1.0),
-                        // ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(15.0),
-                          borderSide:
-                              const BorderSide(color: Colors.white, width: 1.0),
-                        ),
-                        contentPadding: const EdgeInsets.all(20.0),
-                        suffixIcon: _buildIconButton(context),
-                      ),
+                      decoration: CustomOutlineInputDecoration(
+                          // filled: true,
+                          // fillColor: Theme.of(context)
+                          //     .colorScheme
+                          //     .secondary
+                          //     .withAlpha(150),
+                          // hintText: 'Type here...',
+                          // hintStyle: Theme.of(context).textTheme.bodyMedium,
+                          // // disabledBorder: const OutlineInputBorder(
+                          // //   // width: 0.0 produces a thin "hairline" border
+                          // //   borderSide:
+                          // //       const BorderSide(color: Colors.white, width: 1.0),
+                          // // ),
+                          // border: OutlineInputBorder(
+                          //   borderRadius: BorderRadius.circular(15.0),
+                          //   borderSide:
+                          //       const BorderSide(color: Colors.white, width: 1.0),
+                          // ),
+                          // contentPadding: const EdgeInsets.all(20.0),
+                          // suffixIcon: _buildIconButton(context),
+                          ),
                     ),
                   ],
                 ),

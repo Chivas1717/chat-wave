@@ -51,6 +51,7 @@ dependencies:
   intl: ^0.18.0
   draggable_fab: ^0.1.4
   wave: ^0.2.2
+  expand_tap_area: ^1.1.1
 
 dev_dependencies:
   flutter_test:

@@ -4,14 +4,28 @@ import 'package:flutter/material.dart';
 
 import 'colors.dart';
 
-const _fontFontName = 'font';
+const _nunitoFontName = 'Nunito';
 
-CTextStyle get font => const Font();
+CTextStyle get nunito => const Nunito();
 
-class Font extends CTextStyle {
-  const Font()
+class Nunito extends CTextStyle {
+  const Nunito()
       : super._(
-          fontFamily: _fontFontName,
+          fontFamily: _nunitoFontName,
+          fontSize: 14.0,
+          //color: CColors.black,
+          // height: 1.35,
+        );
+}
+
+const _nunitoSansFontName = 'Nunito Sans';
+
+CTextStyle get nunitoSans => const Nunito();
+
+class NunitoSans extends CTextStyle {
+  const NunitoSans()
+      : super._(
+          fontFamily: _nunitoSansFontName,
           fontSize: 14.0,
           //color: CColors.black,
           // height: 1.35,
@@ -132,6 +146,16 @@ class CTextStyle extends TextStyle {
 
   CTextStyle get black => copyWith(color: CColors.black);
 
+  CTextStyle get textMainColor => copyWith(color: CColors.black);
+
+  CTextStyle get secondaryColor => copyWith(color: CColors.grey);
+
+  CTextStyle get blue => copyWith(color: CColors.green);
+
+  CTextStyle get light => copyWith(color: CColors.white);
+
+  CTextStyle get lightText => copyWith(color: CColors.white);
+
   // heights
   CTextStyle get h13 => copyWith(height: 1.35);
 
@@ -146,6 +170,30 @@ class CTextStyle extends TextStyle {
 
   // decoration
   CTextStyle get underline => copyWith(decoration: TextDecoration.underline);
+
+  // custom text styles
+
+  static CTextStyle get titleExtraLarge => nunito.w700.s30;
+
+  static CTextStyle get titleLarge => nunitoSans.w700.s20;
+
+  static CTextStyle get titleMedium => nunitoSans.w700.s16;
+
+  static CTextStyle get titleSmall => nunito.w600.s14;
+
+  static CTextStyle get bodyLarge => nunito.w400.s16;
+
+  static CTextStyle get bodyMedium => nunito.w400.s14;
+
+  static CTextStyle get bodySmall => nunitoSans.w400.s12;
+
+  static CTextStyle get labelText => nunitoSans.w700.s10;
+
+  static CTextStyle get tabBarText => nunito.w600.s12;
+
+  static CTextStyle get buttonsText => nunito.w600.s16;
+
+  static CTextStyle get sectionText => nunito.s16;
 
   @override
   CTextStyle copyWith(
