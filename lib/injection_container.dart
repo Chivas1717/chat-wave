@@ -1,4 +1,7 @@
 import 'package:clean_architecture_template/core/helper/shared_preferences.dart';
+import 'package:clean_architecture_template/core/interceptors/response_interceptor.dart';
+import 'package:clean_architecture_template/core/interceptors/token_interceptor.dart';
+import 'package:clean_architecture_template/features/auth/injection_container.dart';
 import 'package:clean_architecture_template/features/chats/injection_container.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -14,7 +17,7 @@ final sl = GetIt.instance;
 
 const globalDio = 'global';
 
-class InjectionContainer extends Injector with SampleInjector {}
+class InjectionContainer extends Injector with AuthInjector, ChatsInjector {}
 
 abstract class Injector {
   @mustCallSuper
@@ -24,7 +27,7 @@ abstract class Injector {
     sl.registerLazySingleton<SharedPreferencesRepository>(
         () => SharedPreferencesRepository());
 
-    await sl<SharedPreferencesRepository>().init();
+    // await sl<SharedPreferencesRepository>().init();
     sl.registerLazySingleton<AppConfig>(() => AppConfig.init);
 
     sl.registerLazySingleton<Dio>(
@@ -37,20 +40,35 @@ abstract class Injector {
         dio.options.headers = {
           "content-type": "application/json",
           "Accept": "application/json",
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Credentials": "true",
+          "Access-Control-Allow-Headers":
+              "Origin,Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,locale",
+          "Access-Control-Allow-Methods": "POST, OPTIONS"
           // "App-Timezone": currentTimeZone
         };
         dio.interceptors.add(ErrorLoggerInterceptor());
         // if (!sl<AppConfig>().isProductionEnvironment) {
+
+        // }
+
+        dio.interceptors.addAll([
+          TokenInterceptor(sharedPreferencesRepository: sl()),
+          // ErrorNetworkInterceptor(),
+          ResponseInterceptor(),
+        ]);
         dio.interceptors.add(PrettyDioLogger(
           requestBody: true,
           requestHeader: true,
           responseHeader: true,
         ));
-        // }
+
         return dio;
       },
       instanceName: globalDio,
     );
+
+    await sl<SharedPreferencesRepository>().init();
 
     //Core
     sl.registerLazySingleton<NetworkInfo>(() => NetworkInfoImpl(sl()));

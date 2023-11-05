@@ -2,10 +2,8 @@ import 'package:clean_architecture_template/injection_container.dart';
 import 'package:dio/dio.dart';
 
 import 'data/datasource/_datasource.dart';
-import 'data/repositories/_repository_impl.dart';
-import 'domain/repositories/_repository.dart';
 
-mixin SampleInjector on Injector {
+mixin ChatsInjector on Injector {
   @override
   Future<void> init() async {
     await super.init();

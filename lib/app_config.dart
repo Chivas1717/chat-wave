@@ -16,7 +16,7 @@ abstract class AppConfig {
   final String apiHostName;
   final bool isProductionEnvironment;
 
-  String get api => 'http://$apiHostName';
+  String get api => 'https://$apiHostName';
 
   static AppConfig get init => _getForFlavor;
 
@@ -44,7 +44,7 @@ abstract class AppConfig {
 class DevConfig extends AppConfig {
   DevConfig()
       : super._(
-          apiHostName: 'dev.com',
+          apiHostName: 'tg-api-phi.vercel.app',
           isProductionEnvironment: false,
         );
 }
@@ -52,7 +52,7 @@ class DevConfig extends AppConfig {
 class ProdConfig extends AppConfig {
   ProdConfig()
       : super._(
-          apiHostName: 'prod.com',
+          apiHostName: 'tg-api-phi.vercel.app',
           isProductionEnvironment: true,
         );
 }
