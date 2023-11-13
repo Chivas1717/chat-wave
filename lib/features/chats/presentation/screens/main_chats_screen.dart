@@ -1,8 +1,10 @@
 import 'package:clean_architecture_template/core/style/colors.dart';
+import 'package:clean_architecture_template/core/util/pop_up_opener.dart';
 import 'package:clean_architecture_template/core/widgets/transitions/transitions.dart';
 import 'package:clean_architecture_template/features/auth/domain/entities/user.dart';
 import 'package:clean_architecture_template/features/auth/presentation/blocs/user_cubit/user_cubit.dart';
 import 'package:clean_architecture_template/features/chats/presentation/widgets/chats_list.dart';
+import 'package:clean_architecture_template/features/chats/presentation/widgets/create_chat_modal_window.dart';
 import 'package:clean_architecture_template/features/chats/presentation/widgets/favorite_contacts.dart';
 import 'package:clean_architecture_template/features/chats/presentation/widgets/user_avatar.dart';
 import 'package:clean_architecture_template/injection_container.dart';
@@ -169,7 +171,9 @@ class _MainChatsScreenState extends State<MainChatsScreen> {
                         Icons.add,
                         size: 30,
                       ),
-                      onPressed: () {},
+                      onPressed: () {
+                        showPopUp(context, CreateChatModalWindow());
+                      },
                     ),
                   ),
                 ),

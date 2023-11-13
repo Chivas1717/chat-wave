@@ -1,7 +1,9 @@
+import 'package:clean_architecture_template/features/chats/data/datasource/chats_datasource.dart';
+import 'package:clean_architecture_template/features/chats/data/repositories/chats_repository_impl.dart';
+import 'package:clean_architecture_template/features/chats/domain/repositories/chats_repository.dart';
+import 'package:clean_architecture_template/features/chats/presentation/blocs/users/users_cubit.dart';
 import 'package:clean_architecture_template/injection_container.dart';
 import 'package:dio/dio.dart';
-
-import 'data/datasource/_datasource.dart';
 
 mixin ChatsInjector on Injector {
   @override
@@ -10,15 +12,16 @@ mixin ChatsInjector on Injector {
     final Dio dio = sl<Dio>(instanceName: globalDio);
 
     // cubits
-    // sl.registerLazySingleton(() => SampleCubit(repository: sl()));
+    sl.registerLazySingleton(() => UsersCubit(repository: sl()));
 
     // use cases
 
     // repositories
-    // sl.registerLazySingleton<Repository>(
-    //     () => RepositoryImpl(datasource: sl()));
+    sl.registerLazySingleton<ChatsRepository>(
+        () => ChatsRepositoryImpl(chatsDatasource: sl()));
 
     // data sources
-    sl.registerLazySingleton<Datasource>(() => DatasourceImpl(dio: dio));
+    sl.registerLazySingleton<ChatsDatasource>(
+        () => ChatsDatasourceImpl(dio: dio));
   }
 }
