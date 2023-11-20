@@ -3,9 +3,11 @@ import 'package:clean_architecture_template/core/util/pop_up_opener.dart';
 import 'package:clean_architecture_template/core/widgets/transitions/transitions.dart';
 import 'package:clean_architecture_template/features/auth/domain/entities/user.dart';
 import 'package:clean_architecture_template/features/auth/presentation/blocs/user_cubit/user_cubit.dart';
+import 'package:clean_architecture_template/features/chats/presentation/blocs/chats/chats_cubit.dart';
 import 'package:clean_architecture_template/features/chats/presentation/widgets/chats_list.dart';
 import 'package:clean_architecture_template/features/chats/presentation/widgets/create_chat_modal_window.dart';
 import 'package:clean_architecture_template/features/chats/presentation/widgets/favorite_contacts.dart';
+import 'package:clean_architecture_template/features/chats/presentation/widgets/sections.dart';
 import 'package:clean_architecture_template/features/chats/presentation/widgets/user_avatar.dart';
 import 'package:clean_architecture_template/injection_container.dart';
 import 'package:clean_architecture_template/redirector.dart';
@@ -23,10 +25,12 @@ class MainChatsScreen extends StatefulWidget {
 class _MainChatsScreenState extends State<MainChatsScreen> {
   final GlobalKey<ScaffoldState> _globalKey = GlobalKey();
   late final UserCubit userCubit;
+  late final ChatsCubit chatsCubit;
 
   @override
   void initState() {
     userCubit = sl();
+    chatsCubit = sl()..getChats();
     super.initState();
   }
 
@@ -37,151 +41,112 @@ class _MainChatsScreenState extends State<MainChatsScreen> {
       listener: (context, state) {},
       builder: (context, state) {
         return state is UserData
-            ? Scaffold(
-                key: _globalKey,
-                backgroundColor: const Color(0x550080bf),
-                body: Stack(
-                  children: [
-                    Column(
-                      children: [
-                        Padding(
-                          padding:
-                              const EdgeInsets.only(top: 50, left: 5, right: 5),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            ? BlocBuilder<ChatsCubit, ChatsState>(
+                bloc: chatsCubit,
+                builder: (context, chatsState) {
+                  if (chatsState is ChatsData) {
+                    return Scaffold(
+                      key: _globalKey,
+                      backgroundColor: const Color(0x550080bf),
+                      body: Stack(
+                        children: [
+                          Column(
                             children: [
-                              IconButton(
-                                onPressed: () {
-                                  _globalKey.currentState!.openDrawer();
-                                },
-                                icon: const Icon(
-                                  Icons.menu,
-                                  color: CColors.white,
+                              Padding(
+                                padding: const EdgeInsets.only(
+                                    top: 50, left: 5, right: 5),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    IconButton(
+                                      onPressed: () {
+                                        _globalKey.currentState!.openDrawer();
+                                      },
+                                      icon: const Icon(
+                                        Icons.menu,
+                                        color: CColors.white,
+                                      ),
+                                    ),
+                                    IconButton(
+                                      onPressed: () {},
+                                      icon: const Icon(
+                                        Icons.search,
+                                        color: CColors.white,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
-                              IconButton(
-                                onPressed: () {},
-                                icon: const Icon(
-                                  Icons.search,
-                                  color: CColors.white,
-                                ),
-                              ),
+                              const Sections(),
                             ],
                           ),
-                        ),
-                        SizedBox(
-                          height: 50,
-                          child: ListView(
-                            scrollDirection: Axis.horizontal,
-                            padding: const EdgeInsets.only(left: 10),
-                            children: [
-                              TextButton(
-                                onPressed: () {},
-                                child: const Text(
-                                  "Messages",
-                                  style: TextStyle(
-                                      color: CColors.white, fontSize: 26),
+                          Positioned(
+                            top: 160,
+                            left: 0,
+                            right: 0,
+                            child: Container(
+                              padding: const EdgeInsets.only(
+                                  top: 15, left: 25, right: 25),
+                              height: 220,
+                              decoration: const BoxDecoration(
+                                color: Color(0xEE7ce8ff),
+                                borderRadius: BorderRadius.only(
+                                  topLeft: Radius.circular(40),
+                                  topRight: Radius.circular(40),
                                 ),
                               ),
-                              const SizedBox(
-                                width: 35,
-                              ),
-                              TextButton(
-                                onPressed: () {},
-                                child: const Text(
-                                  "Online",
-                                  style: TextStyle(
-                                      color: CColors.grey, fontSize: 26),
-                                ),
-                              ),
-                              const SizedBox(
-                                width: 35,
-                              ),
-                              TextButton(
-                                onPressed: () {},
-                                child: const Text(
-                                  "Groups",
-                                  style: TextStyle(
-                                      color: CColors.grey, fontSize: 26),
-                                ),
-                              ),
-                              const SizedBox(
-                                width: 35,
-                              ),
-                              TextButton(
-                                onPressed: () {},
-                                child: const Text(
-                                  "More",
-                                  style: TextStyle(
-                                      color: CColors.grey, fontSize: 26),
-                                ),
-                              ),
-                              const SizedBox(
-                                width: 35,
-                              ),
-                            ],
+                              child: FavoriteContacts(),
+                            ),
                           ),
-                        )
-                      ],
-                    ),
-                    Positioned(
-                      top: 160,
-                      left: 0,
-                      right: 0,
-                      child: Container(
-                        padding:
-                            const EdgeInsets.only(top: 15, left: 25, right: 25),
-                        height: 220,
-                        decoration: const BoxDecoration(
-                          color: Color(0xEE7ce8ff),
-                          borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(40),
-                            topRight: Radius.circular(40),
+                          Positioned(
+                            top: 325,
+                            left: 0,
+                            right: 0,
+                            bottom: 0,
+                            child: Container(
+                              padding: const EdgeInsets.only(top: 15),
+                              decoration: const BoxDecoration(
+                                borderRadius: BorderRadius.only(
+                                  topLeft: Radius.circular(40),
+                                  topRight: Radius.circular(40),
+                                ),
+                                color: Color(0xFFEFFFFC),
+                              ),
+                              child: ChatsList(chats: chatsState.chats),
+                            ),
+                          ),
+                        ],
+                      ),
+                      floatingActionButton: DraggableFab(
+                        child: SizedBox(
+                          height: 65,
+                          width: 65,
+                          child: FloatingActionButton(
+                            backgroundColor: const Color(0xEE7ce8ff),
+                            child: const Icon(
+                              Icons.add,
+                              size: 30,
+                            ),
+                            onPressed: () {
+                              showPopUp(context, CreateChatModalWindow());
+                            },
                           ),
                         ),
-                        child: FavoriteContacts(),
                       ),
-                    ),
-                    Positioned(
-                      top: 325,
-                      left: 0,
-                      right: 0,
-                      bottom: 0,
-                      child: Container(
-                        padding: const EdgeInsets.only(top: 15),
-                        decoration: const BoxDecoration(
-                          borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(40),
-                            topRight: Radius.circular(40),
-                          ),
-                          color: Color(0xFFEFFFFC),
-                        ),
-                        child: ChatsList(),
+                      drawer: CustomDrawer(
+                        user: state.user,
+                        userCubit: userCubit,
                       ),
+                    );
+                  }
+
+                  return const Scaffold(
+                    body: CircularProgressIndicator(
+                      color: CColors.green,
                     ),
-                  ],
-                ),
-                floatingActionButton: DraggableFab(
-                  child: SizedBox(
-                    height: 65,
-                    width: 65,
-                    child: FloatingActionButton(
-                      backgroundColor: const Color(0xEE7ce8ff),
-                      child: const Icon(
-                        Icons.add,
-                        size: 30,
-                      ),
-                      onPressed: () {
-                        showPopUp(context, CreateChatModalWindow());
-                      },
-                    ),
-                  ),
-                ),
-                drawer: CustomDrawer(
-                  user: state.user,
-                  userCubit: userCubit,
-                ),
-              )
+                  );
+                })
             : const Scaffold(
                 body: SizedBox.shrink(),
               );

@@ -6,11 +6,13 @@ import 'package:flutter/material.dart';
 
 class ChatRow extends StatefulWidget {
   final String img, name, message;
+  final int chatId;
   const ChatRow({
     super.key,
     required this.img,
     required this.name,
     required this.message,
+    required this.chatId,
   });
 
   @override
@@ -24,7 +26,10 @@ class _ChatRowState extends State<ChatRow> {
       behavior: HitTestBehavior.translucent,
       onTap: () {
         Navigator.of(context).push(
-          FadePageTransition(child: ChatScreen()),
+          FadePageTransition(
+              child: ChatScreen(
+            chatId: widget.chatId,
+          )),
         );
       },
       child: Column(

@@ -1,65 +1,19 @@
-import 'message_model.dart';
-import 'user_model.dart';
+import 'package:clean_architecture_template/features/auth/data/models/user_model.dart';
+import 'package:clean_architecture_template/features/chats/data/models/message_model.dart';
+import 'package:clean_architecture_template/features/chats/domain/entities/chat.dart';
 
-class Chat {
-  final String? id;
-  final List<User>? users;
-  final List<Message>? messages;
-
-  const Chat({
-    this.id,
-    this.users = const <User>[],
-    this.messages = const <Message>[],
+class ChatModel extends Chat {
+  ChatModel({
+    super.id,
+    super.users,
+    super.lastMessage,
   });
 
-  Chat copyWith({
-    String? id,
-    List<User>? users,
-    List<Message>? messages,
-  }) {
-    return Chat(
-      id: id ?? this.id,
-      users: users ?? this.users,
-      messages: messages ?? this.messages,
-    );
+  ChatModel.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    users = List.from(json['users']).map((e) => UserModel.fromJson(e)).toList();
+    lastMessage = json['last_message'] == null
+        ? null
+        : MessageModel.fromJson((json['last_message']));
   }
-
-  static List<Chat> chats = [
-    Chat(
-      id: '0',
-      users:
-          User.users.where((user) => user.id == '1' || user.id == '2').toList(),
-      messages: Message.messages
-          .where(
-            (message) =>
-                (message.senderId == '1' || message.senderId == '2') &
-                (message.recipientId == '1' || message.recipientId == '2'),
-          )
-          .toList(),
-    ),
-    Chat(
-      id: '1',
-      users:
-          User.users.where((user) => user.id == '1' || user.id == '3').toList(),
-      messages: Message.messages
-          .where(
-            (message) =>
-                (message.senderId == '1' || message.senderId == '3') &
-                (message.recipientId == '1' || message.recipientId == '3'),
-          )
-          .toList(),
-    ),
-    Chat(
-      id: '2',
-      users:
-          User.users.where((user) => user.id == '1' || user.id == '4').toList(),
-      messages: Message.messages
-          .where(
-            (message) =>
-                (message.senderId == '1' || message.senderId == '4') &
-                (message.recipientId == '1' || message.recipientId == '4'),
-          )
-          .toList(),
-    ),
-  ];
 }

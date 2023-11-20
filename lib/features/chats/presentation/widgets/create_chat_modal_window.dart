@@ -1,5 +1,6 @@
 import 'package:clean_architecture_template/core/style/colors.dart';
 import 'package:clean_architecture_template/core/widgets/buttons/primary_button.dart';
+import 'package:clean_architecture_template/features/chats/presentation/blocs/chats/chats_cubit.dart';
 import 'package:clean_architecture_template/features/chats/presentation/blocs/users/users_cubit.dart';
 import 'package:clean_architecture_template/features/chats/presentation/widgets/user_row.dart';
 import 'package:clean_architecture_template/injection_container.dart';
@@ -15,11 +16,14 @@ class CreateChatModalWindow extends StatefulWidget {
 
 class _CreateChatModalWindowState extends State<CreateChatModalWindow> {
   late UsersCubit usersCubit;
+  late ChatsCubit chatsCubit;
+
   int? selectedUserId;
 
   @override
   void initState() {
     usersCubit = sl();
+    chatsCubit = sl();
     usersCubit.getUsers();
     super.initState();
   }
@@ -42,6 +46,20 @@ class _CreateChatModalWindowState extends State<CreateChatModalWindow> {
                   padding: const EdgeInsets.all(16.0),
                   child: Column(
                     children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          IconButton(
+                            icon: Icon(
+                              Icons.close,
+                              color: CColors.error,
+                            ),
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                          )
+                        ],
+                      ),
                       const Text(
                         'З ким почнем балакати?',
                         style: TextStyle(fontSize: 16),
@@ -64,14 +82,17 @@ class _CreateChatModalWindowState extends State<CreateChatModalWindow> {
                                       padding: const EdgeInsets.symmetric(
                                           horizontal: 10, vertical: 6),
                                       child: GestureDetector(
+                                        behavior: HitTestBehavior.translucent,
                                         onTap: () {
-                                          if (selectedUserId ==
-                                              state.users[index].id) {
-                                            selectedUserId = null;
-                                          } else {
-                                            selectedUserId =
-                                                state.users[index].id;
-                                          }
+                                          setState(() {
+                                            if (selectedUserId ==
+                                                state.users[index].id) {
+                                              selectedUserId = null;
+                                            } else {
+                                              selectedUserId =
+                                                  state.users[index].id;
+                                            }
+                                          });
                                         },
                                         child: UserRow(
                                           user: state.users[index],
@@ -88,6 +109,7 @@ class _CreateChatModalWindowState extends State<CreateChatModalWindow> {
                         active: selectedUserId != null,
                         title: 'Підтвердити',
                         onTap: () {
+                          chatsCubit.createChat(selectedUserId);
                           // signInCubit.signIn(
                           //   SignInInfo(
                           //     email: emailController.value.text,

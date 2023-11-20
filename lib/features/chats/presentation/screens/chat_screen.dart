@@ -1,14 +1,20 @@
+import 'package:clean_architecture_template/core/style/colors.dart';
 import 'package:clean_architecture_template/core/style/input_decorations.dart';
-import 'package:clean_architecture_template/features/chats/data/models/chat_model.dart';
-import 'package:clean_architecture_template/features/chats/data/models/message_model.dart';
-import 'package:clean_architecture_template/features/chats/data/models/user_model.dart';
+import 'package:clean_architecture_template/features/chats/domain/entities/chat_full.dart';
+import 'package:clean_architecture_template/features/chats/domain/entities/message.dart';
+import 'package:clean_architecture_template/features/chats/presentation/blocs/chat/chat_cubit.dart';
+import 'package:clean_architecture_template/injection_container.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:wave/config.dart';
 import 'package:wave/wave.dart';
 
 class ChatScreen extends StatefulWidget {
-  const ChatScreen({Key? key}) : super(key: key);
-
+  const ChatScreen({
+    Key? key,
+    required this.chatId,
+  }) : super(key: key);
+  final int chatId;
   @override
   State<ChatScreen> createState() => _ChatScreenState();
 }
@@ -17,9 +23,8 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
   ScrollController scrollController = ScrollController();
   late AnimationController chatAnimationController;
   TextEditingController textEditingController = TextEditingController();
-  late String text;
-  late User user;
-  late Chat chat;
+  late ChatCubit chatCubit;
+  String? text;
 
   @override
   void initState() {
@@ -27,108 +32,122 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
       vsync: this,
       duration: const Duration(milliseconds: 500),
     );
+    chatCubit = sl()..getChatById(widget.chatId);
     WidgetsBinding.instance.addPostFrameCallback((_) => showChat());
-    user = User.users[0];
-    chat = Chat.chats[0];
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.topRight,
-          colors: [
-            Theme.of(context).colorScheme.secondary,
-            Theme.of(context).colorScheme.primary,
-          ],
-        ),
-      ),
-      child: Scaffold(
-        appBar: _CustomAppBar(user: user),
-        backgroundColor: Colors.white,
-        body: SlideTransition(
-          position: Tween<Offset>(begin: const Offset(0, 1), end: Offset.zero)
-              .animate(chatAnimationController),
-          child: Stack(
-            children: [
-              WaveWidget(
-                config: CustomConfig(
-                  gradients: [
-                    [Colors.blue, Color(0xEEccf9ff)],
-                    [Colors.blue[800]!, Color(0xEE7ce8ff)],
-                    [Colors.blue, Color(0x6655d0ff)],
-                    [Colors.blue, Color(0x5500acdf)]
+    return BlocBuilder<ChatCubit, ChatState>(
+        bloc: chatCubit,
+        builder: (context, state) {
+          if (state is ChatData) {
+            return Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.topRight,
+                  colors: [
+                    Theme.of(context).colorScheme.secondary,
+                    Theme.of(context).colorScheme.primary,
                   ],
-                  durations: [35000, 19440, 10800, 6000],
-                  heightPercentages: [-0.07, -0.03, -0.08, -0.05],
-                  gradientBegin: Alignment.bottomLeft,
-                  gradientEnd: Alignment.topRight,
                 ),
-                size: Size(double.infinity, double.infinity),
-                waveAmplitude: 0,
               ),
-              Container(
-                margin: const EdgeInsets.only(top: 10.0),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 20.0,
-                  vertical: 30.0,
+              child: Scaffold(
+                appBar: _CustomAppBar(
+                  name: state.chat.name,
+                  picture: state.chat.chatPic,
                 ),
-                decoration: BoxDecoration(
-                  color: Colors.transparent,
-                  // borderRadius: const BorderRadius.only(
-                  //   topLeft: Radius.circular(50.0),
-                  //   topRight: Radius.circular(50.0),
-                  // ),
-                ),
-                height: MediaQuery.of(context).size.height,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _ChatMessages(
-                      scrollController: scrollController,
-                      chat: chat,
-                    ),
-                    TextFormField(
-                      controller: textEditingController,
-                      onChanged: (value) {
-                        setState(() {
-                          text = value;
-                        });
-                      },
-                      style: Theme.of(context).textTheme.bodyMedium,
-                      decoration: CustomOutlineInputDecoration(
-                          // filled: true,
-                          // fillColor: Theme.of(context)
-                          //     .colorScheme
-                          //     .secondary
-                          //     .withAlpha(150),
-                          // hintText: 'Type here...',
-                          // hintStyle: Theme.of(context).textTheme.bodyMedium,
-                          // // disabledBorder: const OutlineInputBorder(
-                          // //   // width: 0.0 produces a thin "hairline" border
-                          // //   borderSide:
-                          // //       const BorderSide(color: Colors.white, width: 1.0),
-                          // // ),
-                          // border: OutlineInputBorder(
-                          //   borderRadius: BorderRadius.circular(15.0),
-                          //   borderSide:
-                          //       const BorderSide(color: Colors.white, width: 1.0),
+                backgroundColor: Colors.white,
+                body: SlideTransition(
+                  position:
+                      Tween<Offset>(begin: const Offset(0, 1), end: Offset.zero)
+                          .animate(chatAnimationController),
+                  child: Stack(
+                    children: [
+                      WaveWidget(
+                        config: CustomConfig(
+                          gradients: [
+                            [Colors.blue, const Color(0xEEccf9ff)],
+                            [Colors.blue[800]!, const Color(0xEE7ce8ff)],
+                            [Colors.blue, const Color(0x6655d0ff)],
+                            [Colors.blue, const Color(0x5500acdf)]
+                          ],
+                          durations: [35000, 19440, 10800, 6000],
+                          heightPercentages: [-0.07, -0.03, -0.08, -0.05],
+                          gradientBegin: Alignment.bottomLeft,
+                          gradientEnd: Alignment.topRight,
+                        ),
+                        size: const Size(double.infinity, double.infinity),
+                        waveAmplitude: 0,
+                      ),
+                      Container(
+                        margin: const EdgeInsets.only(top: 10.0),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20.0,
+                          vertical: 30.0,
+                        ),
+                        decoration: const BoxDecoration(
+                          color: Colors.transparent,
+                          // borderRadius: const BorderRadius.only(
+                          //   topLeft: Radius.circular(50.0),
+                          //   topRight: Radius.circular(50.0),
                           // ),
-                          // contentPadding: const EdgeInsets.all(20.0),
-                          // suffixIcon: _buildIconButton(context),
-                          ),
-                    ),
-                  ],
+                        ),
+                        height: MediaQuery.of(context).size.height,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _ChatMessages(
+                              scrollController: scrollController,
+                              chat: state.chat,
+                            ),
+                            TextFormField(
+                              controller: textEditingController,
+                              onChanged: (value) {
+                                setState(() {
+                                  text = value;
+                                });
+                              },
+                              style: Theme.of(context).textTheme.bodyMedium,
+                              decoration: CustomOutlineInputDecoration(
+                                  // filled: true,
+                                  // fillColor: Theme.of(context)
+                                  //     .colorScheme
+                                  //     .secondary
+                                  //     .withAlpha(150),
+                                  // hintText: 'Type here...',
+                                  // hintStyle: Theme.of(context).textTheme.bodyMedium,
+                                  // // disabledBorder: const OutlineInputBorder(
+                                  // //   // width: 0.0 produces a thin "hairline" border
+                                  // //   borderSide:
+                                  // //       const BorderSide(color: Colors.white, width: 1.0),
+                                  // // ),
+                                  // border: OutlineInputBorder(
+                                  //   borderRadius: BorderRadius.circular(15.0),
+                                  //   borderSide:
+                                  //       const BorderSide(color: Colors.white, width: 1.0),
+                                  // ),
+                                  // contentPadding: const EdgeInsets.all(20.0),
+                                  // suffixIcon: _buildIconButton(context),
+                                  ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ],
-          ),
-        ),
-      ),
-    );
+            );
+          }
+          return const Center(
+            child: CircularProgressIndicator(
+              color: CColors.error,
+            ),
+          );
+        });
   }
 
   showChat() {
@@ -140,24 +159,24 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
       icon: const Icon(Icons.send),
       color: Theme.of(context).iconTheme.color,
       onPressed: () {
-        Message message = Message(
-          senderId: '1',
-          recipientId: '2',
-          text: text,
-          createdAt: DateTime.now(),
-        );
-        List<Message> messages = List.from(chat.messages!)..add(message);
-        messages.sort((a, b) => b.createdAt.compareTo(a.createdAt));
-
-        setState(() {
-          chat = chat.copyWith(messages: messages);
-        });
-        scrollController.animateTo(
-          scrollController.position.minScrollExtent,
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeIn,
-        );
-        textEditingController.clear();
+        // Message message = Message(
+        //   senderId: '1',
+        //   recipientId: '2',
+        //   text: text,
+        //   createdAt: DateTime.now(),
+        // );
+        // List<Message> messages = List.from(chat.messages!)..add(message);
+        // messages.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+        //
+        // setState(() {
+        //   chat = chat.copyWith(messages: messages);
+        // });
+        // scrollController.animateTo(
+        //   scrollController.position.minScrollExtent,
+        //   duration: const Duration(milliseconds: 300),
+        //   curve: Curves.easeIn,
+        // );
+        // textEditingController.clear();
       },
     );
   }
@@ -171,10 +190,11 @@ class _ChatMessages extends StatelessWidget {
   }) : super(key: key);
 
   final ScrollController scrollController;
-  final Chat chat;
+  final ChatFull chat;
 
   @override
   Widget build(BuildContext context) {
+    int me = chat.users![0];
     return Expanded(
       child: ListView.builder(
         reverse: true,
@@ -183,7 +203,7 @@ class _ChatMessages extends StatelessWidget {
         itemBuilder: (context, index) {
           Message message = chat.messages![index];
           return Align(
-            alignment: (message.senderId == '1')
+            alignment: (message.sender != me)
                 ? Alignment.centerLeft
                 : Alignment.centerRight,
             child: Container(
@@ -193,13 +213,12 @@ class _ChatMessages extends StatelessWidget {
               padding: const EdgeInsets.all(10.0),
               margin: const EdgeInsets.symmetric(vertical: 5.0),
               decoration: BoxDecoration(
-                color: (message.senderId == '1')
-                    ? Colors.white
-                    : Colors.green[300],
+                color:
+                    (message.sender != me) ? Colors.white : Colors.green[300],
                 borderRadius: const BorderRadius.all(Radius.circular(10)),
               ),
               child: Text(
-                message.text,
+                message.text ?? '? error processing message ?',
                 style: Theme.of(context).textTheme.bodyMedium,
               ),
             ),
@@ -213,19 +232,20 @@ class _ChatMessages extends StatelessWidget {
 class _CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   const _CustomAppBar({
     Key? key,
-    required this.user,
+    required this.name,
+    required this.picture,
   }) : super(key: key);
 
-  final User user;
+  final String? name, picture;
   @override
   Widget build(BuildContext context) {
     return AppBar(
       backgroundColor: Colors.white,
-      iconTheme: IconThemeData(color: Colors.black),
+      iconTheme: const IconThemeData(color: Colors.black),
       title: Column(
         children: [
           Text(
-            '${user.name} ${user.surname}',
+            name ?? '',
             style: Theme.of(context)
                 .textTheme
                 .bodyLarge!
@@ -243,7 +263,7 @@ class _CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
         Container(
           margin: const EdgeInsets.only(right: 10.0),
           child: CircleAvatar(
-            backgroundImage: NetworkImage(user.imageUrl),
+            backgroundImage: picture != null ? NetworkImage(picture!) : null,
           ),
         )
       ],

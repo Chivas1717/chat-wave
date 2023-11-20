@@ -1,3 +1,4 @@
+import 'package:clean_architecture_template/core/helper/images.dart';
 import 'package:clean_architecture_template/core/style/colors.dart';
 import 'package:clean_architecture_template/features/auth/domain/entities/user.dart';
 import 'package:flutter/material.dart';
@@ -23,24 +24,23 @@ class _UserRowState extends State<UserRow> {
         children: [
           CircleAvatar(
             radius: 30.0,
-            backgroundImage: NetworkImage(
-                'https://cdn.britannica.com/05/236505-050-17B6E34A/Elon-Musk-2022.jpg'),
+            backgroundImage: NetworkImage(UserAvatars.avatars[1]),
             backgroundColor: Colors.transparent,
           ),
-          SizedBox(
+          const SizedBox(
             width: 20,
           ),
-          const Text(
-            'name',
-            style: TextStyle(color: CColors.black, fontSize: 20),
+          Text(
+            '${widget.user.username}',
+            style: const TextStyle(color: CColors.black, fontSize: 20),
           ),
-          Spacer(),
+          const Spacer(),
           widget.isSelected
-              ? Icon(
+              ? const Icon(
                   Icons.check_box_outlined,
                   color: CColors.green,
                 )
-              : Icon(
+              : const Icon(
                   Icons.check_box_outline_blank,
                   color: CColors.black,
                 )
