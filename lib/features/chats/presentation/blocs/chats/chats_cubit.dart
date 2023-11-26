@@ -30,6 +30,7 @@ class ChatsCubit extends Cubit<ChatsState> {
 
     final chatsResult = await repository.getChats();
 
+    print(chatsResult);
     chatsResult.fold(
       (failure) => emit(ChatsFailure(message: failure.errorMessage)),
       (chats) => emit(ChatsData(chats: chats)),

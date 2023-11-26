@@ -56,7 +56,10 @@ class _ChatRowState extends State<ChatRow> {
                       ),
                       Text(
                         widget.message,
-                        style: const TextStyle(color: CColors.black),
+                        style: TextStyle(
+                            color: widget.message == 'Joined recently...'
+                                ? CColors.secondary
+                                : CColors.black),
                       ),
                     ],
                   )

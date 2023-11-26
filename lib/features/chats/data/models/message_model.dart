@@ -17,7 +17,7 @@ class MessageModel extends Message {
     senderUsername = json['sender_username'];
     text = json['text'];
     createdAt = json['created_at'];
-    likes = json['likes'];
+    likes = List.from(json['likes']);
     chat = json['chat'];
   }
 }

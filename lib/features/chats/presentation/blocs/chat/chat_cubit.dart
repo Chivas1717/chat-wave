@@ -1,5 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:clean_architecture_template/features/chats/domain/entities/chat_full.dart';
+import 'package:clean_architecture_template/features/chats/domain/entities/message.dart';
 import 'package:clean_architecture_template/features/chats/domain/repositories/chats_repository.dart';
 import 'package:flutter/widgets.dart';
 
@@ -12,7 +13,7 @@ class ChatCubit extends Cubit<ChatState> {
 
   final ChatsRepository repository;
 
-  void getChatById(id) async {
+  void getChatById(int id) async {
     emit(ChatLoading());
 
     final chatsResult = await repository.getChatById(id);
@@ -21,5 +22,11 @@ class ChatCubit extends Cubit<ChatState> {
       (failure) => emit(ChatFailure(message: failure.errorMessage)),
       (chat) => emit(ChatData(chat: chat)),
     );
+  }
+
+  void addMessage(Message message) {
+    (state as ChatData).chat.messages?.add(message);
+    var chat = (state as ChatData).chat;
+    emit(ChatData(chat: chat));
   }
 }

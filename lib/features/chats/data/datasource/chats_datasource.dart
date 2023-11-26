@@ -58,7 +58,7 @@ class ChatsDatasourceImpl extends ChatsDatasource {
 
   @override
   Future<ChatFull> getChatById(id) async {
-    final result = await dio.get('/api/chats/list/');
+    final result = await dio.get('/api/chats/$id/');
 
     ChatFull chat = ChatFullModel.fromJson(result.data);
     return chat;

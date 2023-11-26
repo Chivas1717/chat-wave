@@ -46,16 +46,12 @@ class TokenInterceptor extends Interceptor {
         ) ??
         "";
 
-    print(token);
-    print('token');
-
     if (token != "") {
       if (options.headers.containsKey('Authorization')) {
         options.headers['Authorization'] = 'Token $token';
       } else {
         options.headers.putIfAbsent('Authorization', () => 'Token $token');
       }
-      print(options.headers);
     }
 
     super.onRequest(options, handler);

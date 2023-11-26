@@ -13,6 +13,7 @@ class ChatsList extends StatefulWidget {
 class _ChatsListState extends State<ChatsList> {
   @override
   Widget build(BuildContext context) {
+    print(widget.chats);
     return ListView(
       physics: BouncingScrollPhysics(),
       padding: const EdgeInsets.only(left: 25),
@@ -22,7 +23,8 @@ class _ChatsListState extends State<ChatsList> {
           (index) => ChatRow(
             img: 'img1.jpeg',
             name: widget.chats[index].users![0].username!,
-            message: widget.chats[index].lastMessage?.text ?? '',
+            message:
+                widget.chats[index].lastMessage?.text ?? 'Joined recently...',
             chatId: widget.chats[index].id!,
           ),
         ),

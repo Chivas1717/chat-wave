@@ -52,6 +52,8 @@ dependencies:
   draggable_fab: ^0.1.4
   wave: ^0.2.2
   expand_tap_area: ^1.1.1
+  web_socket_channel: ^2.4.0
+  web_socket_client: ^0.1.0
 
 dev_dependencies:
   flutter_test:

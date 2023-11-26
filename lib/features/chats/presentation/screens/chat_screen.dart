@@ -1,5 +1,10 @@
+import 'dart:convert';
+
+import 'package:clean_architecture_template/core/helper/shared_preferences.dart';
 import 'package:clean_architecture_template/core/style/colors.dart';
 import 'package:clean_architecture_template/core/style/input_decorations.dart';
+import 'package:clean_architecture_template/features/auth/presentation/blocs/user_cubit/user_cubit.dart';
+import 'package:clean_architecture_template/features/chats/data/models/message_model.dart';
 import 'package:clean_architecture_template/features/chats/domain/entities/chat_full.dart';
 import 'package:clean_architecture_template/features/chats/domain/entities/message.dart';
 import 'package:clean_architecture_template/features/chats/presentation/blocs/chat/chat_cubit.dart';
@@ -8,6 +13,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:wave/config.dart';
 import 'package:wave/wave.dart';
+import 'package:web_socket_channel/io.dart';
+import 'package:web_socket_channel/web_socket_channel.dart';
 
 class ChatScreen extends StatefulWidget {
   const ChatScreen({
@@ -15,6 +22,7 @@ class ChatScreen extends StatefulWidget {
     required this.chatId,
   }) : super(key: key);
   final int chatId;
+
   @override
   State<ChatScreen> createState() => _ChatScreenState();
 }
@@ -25,16 +33,42 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
   TextEditingController textEditingController = TextEditingController();
   late ChatCubit chatCubit;
   String? text;
+  late WebSocketChannel _channel;
 
   @override
   void initState() {
+    chatCubit = sl()..getChatById(widget.chatId);
+
+    SharedPreferencesRepository sharedPreferencesRepository = sl();
+    String token = sharedPreferencesRepository.readString(
+          key: SharedPreferencesKeys.token,
+        ) ??
+        "";
+    WebSocketChannel channel = IOWebSocketChannel.connect(
+        "ws://127.0.0.1:8000/ws/chat/${widget.chatId}/",
+        headers: {
+          'Authorization': 'Token $token',
+        });
+    channel.stream.listen((event) {
+      if (jsonDecode(event)['type'] == 'chat_message') {
+        Message message = MessageModel.fromJson(jsonDecode(event)['message']);
+        (chatCubit.addMessage(message));
+      }
+    });
+    _channel = channel;
+
     chatAnimationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 500),
     );
-    chatCubit = sl()..getChatById(widget.chatId);
     WidgetsBinding.instance.addPostFrameCallback((_) => showChat());
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _channel.sink.close();
+    super.dispose();
   }
 
   @override
@@ -194,10 +228,10 @@ class _ChatMessages extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    int me = chat.users![0];
+    int me = sl<UserCubit>().state.user.id ?? 0;
     return Expanded(
       child: ListView.builder(
-        reverse: true,
+        reverse: false,
         controller: scrollController,
         itemCount: chat.messages!.length,
         itemBuilder: (context, index) {
