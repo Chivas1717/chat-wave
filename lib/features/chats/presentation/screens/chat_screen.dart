@@ -34,25 +34,36 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
   late ChatCubit chatCubit;
   String? text;
   late WebSocketChannel _channel;
+  bool isSending = false;
 
   @override
   void initState() {
+    SharedPreferencesRepository sharedPreferencesRepository = sl();
     chatCubit = sl()..getChatById(widget.chatId);
 
-    SharedPreferencesRepository sharedPreferencesRepository = sl();
     String token = sharedPreferencesRepository.readString(
           key: SharedPreferencesKeys.token,
         ) ??
         "";
+
     WebSocketChannel channel = IOWebSocketChannel.connect(
         "ws://127.0.0.1:8000/ws/chat/${widget.chatId}/",
         headers: {
           'Authorization': 'Token $token',
         });
+
     channel.stream.listen((event) {
       if (jsonDecode(event)['type'] == 'chat_message') {
         Message message = MessageModel.fromJson(jsonDecode(event)['message']);
         (chatCubit.addMessage(message));
+        setState(() {
+          isSending = false;
+        });
+        scrollController.animateTo(
+          scrollController.position.minScrollExtent,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeIn,
+        );
       }
     });
     _channel = channel;
@@ -146,26 +157,26 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                               },
                               style: Theme.of(context).textTheme.bodyMedium,
                               decoration: CustomOutlineInputDecoration(
-                                  // filled: true,
-                                  // fillColor: Theme.of(context)
-                                  //     .colorScheme
-                                  //     .secondary
-                                  //     .withAlpha(150),
-                                  // hintText: 'Type here...',
-                                  // hintStyle: Theme.of(context).textTheme.bodyMedium,
-                                  // // disabledBorder: const OutlineInputBorder(
-                                  // //   // width: 0.0 produces a thin "hairline" border
-                                  // //   borderSide:
-                                  // //       const BorderSide(color: Colors.white, width: 1.0),
-                                  // // ),
-                                  // border: OutlineInputBorder(
-                                  //   borderRadius: BorderRadius.circular(15.0),
-                                  //   borderSide:
-                                  //       const BorderSide(color: Colors.white, width: 1.0),
-                                  // ),
-                                  // contentPadding: const EdgeInsets.all(20.0),
-                                  // suffixIcon: _buildIconButton(context),
-                                  ),
+                                icon: _buildIconButton(context),
+                                // filled: true,
+                                // fillColor: Theme.of(context)
+                                //     .colorScheme
+                                //     .secondary
+                                //     .withAlpha(150),
+                                // hintText: 'Type here...',
+                                // hintStyle: Theme.of(context).textTheme.bodyMedium,
+                                // // disabledBorder: const OutlineInputBorder(
+                                // //   // width: 0.0 produces a thin "hairline" border
+                                // //   borderSide:
+                                // //       const BorderSide(color: Colors.white, width: 1.0),
+                                // // ),
+                                // border: OutlineInputBorder(
+                                //   borderRadius: BorderRadius.circular(15.0),
+                                //   borderSide:
+                                //       const BorderSide(color: Colors.white, width: 1.0),
+                                // ),
+                                // contentPadding: const EdgeInsets.all(20.0),
+                              ),
                             ),
                           ],
                         ),
@@ -188,11 +199,25 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
     chatAnimationController.forward();
   }
 
+  void sendMessage() {
+    if (textEditingController.text.isNotEmpty) {
+      _channel.sink.add(
+        jsonEncode(
+          {"type": "chat_message", "message": textEditingController.text},
+        ),
+      );
+    }
+    setState(() {
+      isSending = true;
+    });
+  }
+
   IconButton _buildIconButton(BuildContext context) {
     return IconButton(
       icon: const Icon(Icons.send),
       color: Theme.of(context).iconTheme.color,
       onPressed: () {
+        sendMessage();
         // Message message = Message(
         //   senderId: '1',
         //   recipientId: '2',
@@ -205,12 +230,8 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
         // setState(() {
         //   chat = chat.copyWith(messages: messages);
         // });
-        // scrollController.animateTo(
-        //   scrollController.position.minScrollExtent,
-        //   duration: const Duration(milliseconds: 300),
-        //   curve: Curves.easeIn,
-        // );
-        // textEditingController.clear();
+
+        textEditingController.clear();
       },
     );
   }

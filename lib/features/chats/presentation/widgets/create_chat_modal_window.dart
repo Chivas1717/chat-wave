@@ -50,7 +50,7 @@ class _CreateChatModalWindowState extends State<CreateChatModalWindow> {
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
                           IconButton(
-                            icon: Icon(
+                            icon: const Icon(
                               Icons.close,
                               color: CColors.error,
                             ),

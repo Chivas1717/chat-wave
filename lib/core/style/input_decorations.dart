@@ -8,15 +8,19 @@ BaseInputDecoration get cOutlineInputDecoration =>
     CustomOutlineInputDecoration();
 
 class CustomOutlineInputDecoration extends BaseInputDecoration {
-  CustomOutlineInputDecoration()
+  final icon;
+  CustomOutlineInputDecoration({this.icon})
       : super(
           textStyle: nunito.white.s12.w500,
           border: COutlineInputBorders.inactiveTextField,
           enabledBorder: COutlineInputBorders.inactiveTextField,
           focusedBorder: COutlineInputBorders.activeTextField,
           filled: true,
-          fillColor: Color(0x5500acdf),
+          fillColor: const Color(0x55d2e5ec),
           hintStyle: nunitoSans.white.s14.w500,
+          suffixIcon: icon,
+          icon: null,
+          prefixIcon: null,
         );
 }
 
