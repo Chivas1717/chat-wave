@@ -200,7 +200,7 @@ class BaseInputDecoration extends InputDecoration {
       contentPaddingType: contentPaddingType ?? this.contentPaddingType,
       fieldHeight: fieldHeight ?? this.fieldHeight,
       textStyle: textStyle ?? this.textStyle,
-      icon: icon ?? this.icon,
+      icon: icon,
       iconColor: iconColor ?? this.iconColor,
       label: label ?? this.label,
       labelText: labelText ?? this.labelText,
