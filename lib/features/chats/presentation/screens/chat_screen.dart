@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:clean_architecture_template/core/helper/images.dart';
 import 'package:clean_architecture_template/core/helper/shared_preferences.dart';
 import 'package:clean_architecture_template/core/style/colors.dart';
 import 'package:clean_architecture_template/core/style/input_decorations.dart';
@@ -11,6 +12,7 @@ import 'package:clean_architecture_template/features/chats/presentation/blocs/ch
 import 'package:clean_architecture_template/injection_container.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:wave/config.dart';
 import 'package:wave/wave.dart';
 import 'package:web_socket_channel/io.dart';
@@ -60,7 +62,16 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
           isSending = false;
         });
         scrollController.animateTo(
-          scrollController.position.minScrollExtent,
+          scrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeIn,
+        );
+      } else if (jsonDecode(event)['type'] == 'message_liked') {
+        print('getting');
+        Message message = MessageModel.fromJson(jsonDecode(event)['message']);
+        (chatCubit.likeMessage(message));
+        scrollController.animateTo(
+          scrollController.position.maxScrollExtent,
           duration: const Duration(milliseconds: 300),
           curve: Curves.easeIn,
         );
@@ -135,10 +146,6 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                         ),
                         decoration: const BoxDecoration(
                           color: Colors.transparent,
-                          // borderRadius: const BorderRadius.only(
-                          //   topLeft: Radius.circular(50.0),
-                          //   topRight: Radius.circular(50.0),
-                          // ),
                         ),
                         height: MediaQuery.of(context).size.height,
                         child: Column(
@@ -147,6 +154,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                             _ChatMessages(
                               scrollController: scrollController,
                               chat: state.chat,
+                              likeFunc: likeMessage,
                             ),
                             TextFormField(
                               controller: textEditingController,
@@ -158,24 +166,6 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                               style: Theme.of(context).textTheme.bodyMedium,
                               decoration: CustomOutlineInputDecoration(
                                 icon: _buildIconButton(context),
-                                // filled: true,
-                                // fillColor: Theme.of(context)
-                                //     .colorScheme
-                                //     .secondary
-                                //     .withAlpha(150),
-                                // hintText: 'Type here...',
-                                // hintStyle: Theme.of(context).textTheme.bodyMedium,
-                                // // disabledBorder: const OutlineInputBorder(
-                                // //   // width: 0.0 produces a thin "hairline" border
-                                // //   borderSide:
-                                // //       const BorderSide(color: Colors.white, width: 1.0),
-                                // // ),
-                                // border: OutlineInputBorder(
-                                //   borderRadius: BorderRadius.circular(15.0),
-                                //   borderSide:
-                                //       const BorderSide(color: Colors.white, width: 1.0),
-                                // ),
-                                // contentPadding: const EdgeInsets.all(20.0),
                               ),
                             ),
                           ],
@@ -212,25 +202,20 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
     });
   }
 
+  void likeMessage(messageId) {
+    _channel.sink.add(
+      jsonEncode(
+        {"type": "message_liked", "message_id": messageId},
+      ),
+    );
+  }
+
   IconButton _buildIconButton(BuildContext context) {
     return IconButton(
       icon: const Icon(Icons.send),
       color: Theme.of(context).iconTheme.color,
       onPressed: () {
         sendMessage();
-        // Message message = Message(
-        //   senderId: '1',
-        //   recipientId: '2',
-        //   text: text,
-        //   createdAt: DateTime.now(),
-        // );
-        // List<Message> messages = List.from(chat.messages!)..add(message);
-        // messages.sort((a, b) => b.createdAt.compareTo(a.createdAt));
-        //
-        // setState(() {
-        //   chat = chat.copyWith(messages: messages);
-        // });
-
         textEditingController.clear();
       },
     );
@@ -242,10 +227,12 @@ class _ChatMessages extends StatelessWidget {
     Key? key,
     required this.scrollController,
     required this.chat,
+    required this.likeFunc,
   }) : super(key: key);
 
   final ScrollController scrollController;
   final ChatFull chat;
+  final Function(int messageId) likeFunc;
 
   @override
   Widget build(BuildContext context) {
@@ -257,24 +244,55 @@ class _ChatMessages extends StatelessWidget {
         itemCount: chat.messages!.length,
         itemBuilder: (context, index) {
           Message message = chat.messages![index];
-          return Align(
-            alignment: (message.sender != me)
-                ? Alignment.centerLeft
-                : Alignment.centerRight,
-            child: Container(
-              constraints: BoxConstraints(
-                maxWidth: MediaQuery.of(context).size.width * 0.66,
-              ),
-              padding: const EdgeInsets.all(10.0),
-              margin: const EdgeInsets.symmetric(vertical: 5.0),
-              decoration: BoxDecoration(
-                color:
-                    (message.sender != me) ? Colors.white : Colors.green[300],
-                borderRadius: const BorderRadius.all(Radius.circular(10)),
-              ),
-              child: Text(
-                message.text ?? '? error processing message ?',
-                style: Theme.of(context).textTheme.bodyMedium,
+          return GestureDetector(
+            onDoubleTap: () {
+              likeFunc(message.id!);
+            },
+            child: Align(
+              alignment: (message.sender != me)
+                  ? Alignment.centerLeft
+                  : Alignment.centerRight,
+              child: Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  Container(
+                    constraints: BoxConstraints(
+                      maxWidth: MediaQuery.of(context).size.width * 0.66,
+                    ),
+                    padding: const EdgeInsets.all(10.0),
+                    margin: EdgeInsets.only(
+                        top: 5, bottom: message.likes!.isNotEmpty ? 10 : 5),
+                    decoration: BoxDecoration(
+                      color: (message.sender != me)
+                          ? Colors.white
+                          : Colors.green[300],
+                      borderRadius: const BorderRadius.all(Radius.circular(10)),
+                    ),
+                    child: Text(
+                      message.text ?? '? error processing message ?',
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
+                  ),
+                  message.likes!.isNotEmpty
+                      ? Positioned(
+                          left: -8,
+                          bottom: 2,
+                          child: Container(
+                            height: 20,
+                            width: 20,
+                            decoration: const BoxDecoration(
+                              color: Colors.transparent,
+                            ),
+                            child: SvgPicture.asset(
+                              SvgIcons.like,
+                              height: 10,
+                              width: 10,
+                              color: CColors.error,
+                            ),
+                          ),
+                        )
+                      : const SizedBox.shrink(),
+                ],
               ),
             ),
           );

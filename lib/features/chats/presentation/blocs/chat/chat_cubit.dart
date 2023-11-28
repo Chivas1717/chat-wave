@@ -29,4 +29,17 @@ class ChatCubit extends Cubit<ChatState> {
     var chat = (state as ChatData).chat;
     emit(ChatData(chat: chat));
   }
+
+  void likeMessage(Message message) {
+    int index;
+    for (var i = 0; i < (state as ChatData).chat.messages!.length; i++) {
+      if ((state as ChatData).chat.messages![i].id == message.id) {
+        index = i;
+        (state as ChatData).chat.messages![index] = message;
+        var chat = (state as ChatData).chat;
+        emit(ChatData(chat: chat));
+        break;
+      }
+    }
+  }
 }
