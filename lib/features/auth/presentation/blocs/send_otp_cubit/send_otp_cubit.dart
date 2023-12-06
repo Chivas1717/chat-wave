@@ -21,10 +21,13 @@ class SendOtpCubit extends Cubit<SendOtpState> {
     );
 
     otpCheckingResult.fold(
-      (failure) => emit(OtpFailure(
-        errorMessage: failure.errorMessage,
-        errorCode: failure.errorCode ?? 1,
-      )),
+      (failure) {
+        print(failure.errorMessage);
+        emit(OtpFailure(
+          errorMessage: failure.errorMessage,
+          errorCode: failure.errorCode ?? 1,
+        ));
+      },
       (result) => emit(OtpSuccess()),
     );
   }

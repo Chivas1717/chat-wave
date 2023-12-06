@@ -24,7 +24,7 @@ class AuthRepositoryImpl extends AuthRepository {
   FutureFailable<bool> sendOtp(String email) {
     return RepositoryRequestHandler<bool>()(
       request: () => authDatasource.sendOtp(email),
-      defaultFailure: IncorrectEmailFailure(),
+      defaultFailure: LogInFailure(),
     );
   }
 

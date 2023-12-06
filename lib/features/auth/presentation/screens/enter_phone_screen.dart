@@ -51,6 +51,12 @@ class _EnterPhoneScreenState extends State<EnterPhoneScreen> {
                 ),
               ),
             );
+          } else if (state is OtpFailure) {
+            setState(() {
+              errorMessage = state.errorMessage;
+              showPhoneError = true;
+              _formKey.currentState!.validate();
+            });
           }
         },
         builder: (context, state) {

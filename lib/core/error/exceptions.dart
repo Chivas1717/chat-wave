@@ -1,4 +1,3 @@
-import 'package:clean_architecture_template/core/models/server_error.dart';
 import 'package:clean_architecture_template/core/network/network_info.dart';
 import 'package:clean_architecture_template/injection_container.dart';
 import 'package:dio/dio.dart';
@@ -11,19 +10,19 @@ Future<Failure> errorHandler(Object error, Failure? defaultFailure) async {
     if (error is DioError) {
       //print(error);
       if (error.response != null) {
-        if (error.response!.statusCode == 403 ||
-            error.response!.statusCode == 401) {
-          return UnauthorizedFailure();
-        } else if (error.response!.statusCode == 403 &&
-            defaultFailure is ProfileFailure) {
-          return UnauthorizedFailure();
-        }
-        ServerError serverError =
-            ServerError.fromJson(error.response?.data ?? {});
+        // if (error.response!.statusCode == 403 ||
+        //     error.response!.statusCode == 401) {
+        //   return UnauthorizedFailure();
+        // } else if (error.response!.statusCode == 403 &&
+        //     defaultFailure is ProfileFailure) {
+        //   return UnauthorizedFailure();
+        // }
+        // ServerError serverError =
+        //     ServerError.fromJson(error.response?.data['error'] ?? {});
         return Failure(
-            errorMessage: serverError.detail != null &&
-                    serverError.detail!.isNotEmpty
-                ? serverError.detail!
+            errorMessage: error.response?.data['error'] != null &&
+                    error.response?.data['error'].isNotEmpty
+                ? error.response?.data['error']!
                 : "Sorry, we cannot process your request at the moment. Please contact the support team.");
       }
     }

@@ -22,7 +22,9 @@ class _ChatsListState extends State<ChatsList> {
           widget.chats.length,
           (index) => ChatRow(
             img: 'img1.jpeg',
-            name: widget.chats[index].users![0].username!,
+            name: widget.chats[index].users!.length > 0
+                ? widget.chats[index].users![0].username!
+                : widget.chats[index].users![0].username!,
             message:
                 widget.chats[index].lastMessage?.text ?? 'Joined recently...',
             chatId: widget.chats[index].id!,

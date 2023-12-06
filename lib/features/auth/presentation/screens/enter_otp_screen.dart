@@ -53,6 +53,12 @@ class _EnterOtpScreenState extends State<EnterOtpScreen> {
                 : Navigator.of(context).push(
                     FadePageTransition(child: const MainChatsScreen()),
                   );
+          } else if (state is CheckOtpFailure) {
+            setState(() {
+              errorMessage = state.errorMessage;
+              showCodeError = true;
+              _formKey.currentState!.validate();
+            });
           }
         },
         builder: (context, state) {

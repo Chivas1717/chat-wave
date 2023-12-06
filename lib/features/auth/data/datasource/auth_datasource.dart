@@ -63,7 +63,6 @@ class AuthDatasourceImpl extends AuthDatasource {
     );
 
     if (result.data['token'] != null) {
-      print('token exist');
       final String token = result.data['token'];
 
       await sharedPreferencesRepository.writeString(
