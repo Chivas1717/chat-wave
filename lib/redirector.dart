@@ -95,6 +95,7 @@ class _RedirectPageState extends State<RedirectPage>
         builder: (context, state) {
           return Scaffold(
             backgroundColor: CColors.white,
+
             body: SlideTransition(
               position:
                   Tween<Offset>(begin: const Offset(0, 1), end: Offset.zero)

@@ -36,4 +36,14 @@ class User {
       online: online ?? this.online,
     );
   }
+
+  factory User.fromJson(Map<String, dynamic> json) {
+    int? id = json['id'];
+    String? username = json['username'];
+
+    return User(
+      id: id,
+      username: username,
+    );
+  }
 }
